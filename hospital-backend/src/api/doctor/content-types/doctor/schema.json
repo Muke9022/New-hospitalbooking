@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "doctors",
+  "info": {
+    "singularName": "doctor",
+    "pluralName": "doctors",
+    "displayName": "Doctor",
+    "description": "Hospital Doctors"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "specialty": {
+      "type": "string",
+      "required": true
+    },
+    "department": {
+      "type": "string",
+      "required": true
+    },
+    "qualification": {
+      "type": "string"
+    },
+    "experience": {
+      "type": "integer"
+    },
+    "rating": {
+      "type": "decimal"
+    },
+    "reviews": {
+      "type": "integer"
+    },
+    "patients": {
+      "type": "integer"
+    },
+    "fee": {
+      "type": "integer",
+      "required": true
+    },
+    "available": {
+      "type": "boolean",
+      "default": true
+    },
+    "hospital": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "text"
+    },
+    "gender": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "workingStartTime": {
+      "type": "string",
+      "required": true
+    },
+    "workingEndTime": {
+      "type": "string",
+      "required": true
+    },
+    "slotDuration": {
+      "type": "integer",
+      "required": true
+    }
+  }
+}

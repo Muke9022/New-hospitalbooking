@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notifications",
+  "info": {
+    "singularName": "notification",
+    "pluralName": "notifications",
+    "displayName": "notification"
+  },
+ "options": {
+  "draftAndPublish": false
+},
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "text"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "confirmed",
+        "reminder",
+        "completed",
+        "cancelled",
+        "login",
+        "update"
+      ]
+    },
+    
+    "read": {
+      "type": "boolean"
+    },
+    "activityDate": {
+      "type": "date"
+    },
+    "activityTime": {
+      "type": "string"
+    },
+   "user": {
+  "type": "relation",
+  "relation": "manyToOne",
+  "target": "plugin::users-permissions.user"
+},
+"appointment": {
+  "type": "relation",
+  "relation": "manyToOne",
+  "target": "api::appointment.appointment"
+}
+  }
+}
