@@ -29,19 +29,23 @@ export default {
           documentId: item.documentId,
         });
       }
-strapi.log.info("=== SEND OTP START ===");
-strapi.log.info(`Email: ${email}`);
-      // Save and PUBLISH new OTP
-     const createdOtp = await strapi.documents("api::otp.otp").create({
-  data: {
-    email,
-    otp,
-    expiresAt,
-  },
-});
 
-strapi.log.info("OTP CREATED");
-strapi.log.info(JSON.stringify(createdOtp));
+      strapi.log.info("=== SEND OTP START ===");
+      strapi.log.info(`Email: ${email}`);
+
+      // Save and PUBLISH new OTP
+      const createdOtp = await strapi.documents("api::otp.otp").create({
+        data: {
+          email,
+          otp,
+          expiresAt,
+        },
+      });
+
+      strapi.log.info("OTP CREATED");
+      strapi.log.info(JSON.stringify(createdOtp));
+      strapi.log.info("BEFORE EMAIL");
+
       // Send email
       await strapi.plugin("email").service("email").send({
         to: email,
@@ -55,14 +59,17 @@ strapi.log.info(JSON.stringify(createdOtp));
         `,
       });
 
+      strapi.log.info("AFTER EMAIL");
+
       ctx.body = {
         success: true,
         message: "OTP sent successfully",
       };
-    } catch (err) {
-  console.error("OTP SEND ERROR =>", err);
-  throw err;
-}
+    } catch (err: any) {
+      console.error("OTP SEND ERROR =>", err);
+      strapi.log.error(`OTP SEND ERROR => ${err?.message}`);
+      ctx.internalServerError(err?.message || "Something went wrong");
+    }
   },
 
   async verify(ctx: Context) {
@@ -167,7 +174,7 @@ strapi.log.info(JSON.stringify(createdOtp));
         .add({
           username: email.split("@")[0],
           email: email.trim().toLowerCase(),
-password: password,
+          password: password,
           confirmed: true,
           blocked: false,
           provider: "local",

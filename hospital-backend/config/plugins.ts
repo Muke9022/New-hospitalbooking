@@ -27,7 +27,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   config: {},
 },
 
- email: {
+  email: {
   config: {
     provider: "nodemailer",
     providerOptions: {
