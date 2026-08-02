@@ -5,8 +5,9 @@ async function fetchAPI<T>(path: string, options: RequestInit = {}): Promise<T> 
   let token: string | null = null;
 
   if (typeof window !== "undefined") {
-    const rawToken = localStorage.getItem("medibook_token");
-
+   const rawToken =
+  localStorage.getItem("medibook_token") ||
+  localStorage.getItem("token");
     if (
       rawToken &&
       rawToken !== "undefined" &&

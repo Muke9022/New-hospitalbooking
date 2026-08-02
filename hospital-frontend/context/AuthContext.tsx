@@ -65,8 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
 
       const data = await res.json();
-      console.log("LOGIN STATUS:", res.status);
-console.log("LOGIN DATA:", data);
+      
+console.log("LOGIN RESPONSE =>", data);
+console.log("JWT =>", data.jwt);
 
       if (!res.ok) {
         return { 
@@ -100,6 +101,10 @@ console.log("LOGIN DATA:", data);
       localStorage.setItem('medibook_user', JSON.stringify(strapiUser));
       localStorage.setItem('medibook_token', data.jwt);
       localStorage.setItem('medibook_isAdmin', String(checkIsAdmin));
+
+      // 👈 Tu sangitlele add kele
+      localStorage.setItem("token", data.jwt);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       return { success: true };
     } catch (err) {
@@ -174,6 +179,10 @@ console.log("LOGIN DATA:", data);
     localStorage.removeItem('medibook_user');
     localStorage.removeItem('medibook_token');
     localStorage.removeItem('medibook_isAdmin');
+
+    // 👈 Tu sangitlele remove kele
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }, []);
 
   const updateUser = useCallback((updates: Partial<User>) => {

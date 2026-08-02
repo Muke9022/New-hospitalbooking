@@ -17,6 +17,7 @@ export default {
 
       // Expire after 5 minutes
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      strapi.log.info(`OTP Send Request: ${email}`);
 
       // Delete old OTPs (both draft & published) for this email
       const oldOtp = await strapi.documents("api::otp.otp").findMany({
@@ -28,16 +29,19 @@ export default {
           documentId: item.documentId,
         });
       }
-
+strapi.log.info("=== SEND OTP START ===");
+strapi.log.info(`Email: ${email}`);
       // Save and PUBLISH new OTP
-      await strapi.documents("api::otp.otp").create({
-        data: {
-          email,
-          otp,
-          expiresAt,
-        },
-      });
+     const createdOtp = await strapi.documents("api::otp.otp").create({
+  data: {
+    email,
+    otp,
+    expiresAt,
+  },
+});
 
+strapi.log.info("OTP CREATED");
+strapi.log.info(JSON.stringify(createdOtp));
       // Send email
       await strapi.plugin("email").service("email").send({
         to: email,
@@ -56,9 +60,9 @@ export default {
         message: "OTP sent successfully",
       };
     } catch (err) {
-      console.error(err);
-      ctx.internalServerError("Something went wrong");
-    }
+  console.error("OTP SEND ERROR =>", err);
+  throw err;
+}
   },
 
   async verify(ctx: Context) {
