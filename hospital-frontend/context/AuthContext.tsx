@@ -62,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier: email, password }),
       });
+      
 
       const data = await res.json();
       console.log("LOGIN STATUS:", res.status);
@@ -80,6 +81,7 @@ console.log("LOGIN DATA:", data);
 
       const strapiUser: User = {
         id: String(data.user.id),
+        documentId: data.user.documentId,
         name: data.user.name || data.user.username,
         email: data.user.email,
         phone: data.user.phone || '',
