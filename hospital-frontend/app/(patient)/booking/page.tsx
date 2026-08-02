@@ -257,7 +257,7 @@ export default function BookingPage() {
 
       const status =
         appointment.appointmentStatus || appointment.status || appointment.attributes?.appointmentStatus || appointment.attributes?.status;
-
+console.log("USER =>", user);
       return (
         slotStart === selectedSlot &&
         patientEmail === user.email &&
@@ -314,9 +314,12 @@ export default function BookingPage() {
         read: false,
         activityDate: new Date().toISOString().split("T")[0],
         activityTime: slot.label,
-        user: user.id,
+       user: {
+  connect: [user.documentId],
+},
         appointment: appointmentRes?.data?.documentId,
       });
+      console.log("USER =>", user);
 
       bookAppointment({
         id: String(appointmentRes.data.id),
