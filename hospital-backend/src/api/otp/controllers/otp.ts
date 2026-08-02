@@ -156,7 +156,6 @@ export default {
       }
 
       // Password hashing before creating user
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await strapi
         .plugin("users-permissions")
@@ -164,7 +163,7 @@ export default {
         .add({
           username: email.split("@")[0],
           email: email.trim().toLowerCase(),
-          password: hashedPassword,
+password: password,
           confirmed: true,
           blocked: false,
           provider: "local",
