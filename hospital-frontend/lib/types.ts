@@ -45,6 +45,7 @@ export interface Department {
 
 export interface Appointment {
   id: string;
+  documentId?: string;
   doctorId: string;
   doctorName: string;
   department: string;
@@ -52,7 +53,9 @@ export interface Appointment {
   slotStart: string;
   slotEnd: string;
   slotLabel: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
+  
+  
+  appointmentStatus?: 'upcoming' | 'completed' | 'cancelled';
   notes?: string;
   fee?: number;
   doctorImage?: string;

@@ -94,7 +94,7 @@ export function AppointmentProvider({
             slotStart: item.slotStart,
             slotEnd: item.slotEnd,
             slotLabel: item.slotLabel,
-            status: item.appointmentStatus,
+           appointmentStatus: item.appointmentStatus,
             fee: item.fee,
             doctorImage: item.doctorImage,
           })) || [];
