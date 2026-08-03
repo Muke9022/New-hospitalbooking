@@ -5,9 +5,9 @@ async function fetchAPI<T>(path: string, options: RequestInit = {}): Promise<T> 
   let token: string | null = null;
 
   if (typeof window !== "undefined") {
-   const rawToken =
-  localStorage.getItem("medibook_token") ||
-  localStorage.getItem("token");
+    const rawToken =
+      localStorage.getItem("medibook_token") ||
+      localStorage.getItem("token");
     if (
       rawToken &&
       rawToken !== "undefined" &&
@@ -23,6 +23,10 @@ async function fetchAPI<T>(path: string, options: RequestInit = {}): Promise<T> 
     ...options.headers,
   };
 
+  // 🌟 Handle Render Cold Starts with a 90-second timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90000);
+
   // ===== DEBUG =====
   console.log("==================================");
   console.log("API URL :", `${API_URL}${path}`);
@@ -31,22 +35,42 @@ async function fetchAPI<T>(path: string, options: RequestInit = {}): Promise<T> 
   console.log("BODY :", options.body);
   console.log("==================================");
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
 
-  const data = await res.json();
+    clearTimeout(timeoutId);
 
-  console.log("STATUS :", res.status);
-  console.log("RESPONSE :", data);
+    const data = await res.json();
 
-  if (!res.ok) {
-    console.error("API ERROR :", data);
-    throw new Error(JSON.stringify(data));
+    console.log("STATUS :", res.status);
+    console.log("RESPONSE :", data);
+
+    if (!res.ok) {
+      console.error("API ERROR :", data);
+      throw new Error(JSON.stringify(data));
+    }
+
+    return data;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+
+    if (error.name === "AbortError") {
+      console.error("API TIMEOUT ERROR: Server took too long to wake up.");
+      throw new Error(
+        JSON.stringify({
+          error: {
+            message: "Server is waking up (Render Cold Start). Please wait a moment and try again.",
+          },
+        })
+      );
+    }
+
+    throw error;
   }
-
-  return data;
 }
 
 export const api = {

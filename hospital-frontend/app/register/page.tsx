@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft, CheckCircle, Mail } from 'lucide-react';
@@ -14,8 +14,21 @@ export default function RegisterPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Create Account');
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+
+  // 🌟 Render Cold-Start Warmup: Page load hote hi server ko background me jagao
+  useEffect(() => {
+    const wakeUpServer = async () => {
+      try {
+        await api.doctors.list();
+      } catch (e) {
+        // Silent catch
+      }
+    };
+    wakeUpServer();
+  }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -34,19 +47,37 @@ export default function RegisterPage() {
     setErrors(e);
     if (Object.keys(e).length === 0) {
       setLoading(true);
+      setLoadingText('Sending OTP...');
+
+      // Agar server spin-up hone me time lage (4s+), toh user ko inform karo
+      const timer = setTimeout(() => {
+        setLoadingText('Waking up server, please wait...');
+      }, 4000);
 
       try {
         const cleanEmail = form.email.trim().toLowerCase();
         await api.auth.sendOtp(cleanEmail);
 
+        clearTimeout(timer);
         setLoading(false);
         setShowOtp(true);
       } catch (err: any) {
+        clearTimeout(timer);
         setLoading(false);
 
+        let msg = "Failed to send OTP";
+        try {
+          const parsed = JSON.parse(err.message);
+          msg = parsed?.error?.message || msg;
+        } catch {
+          msg = err.message || msg;
+        }
+
         setErrors({
-          general: err.message || "Failed to send OTP",
+          general: msg,
         });
+      } finally {
+        setLoadingText('Create Account');
       }
     }
   };
@@ -59,8 +90,15 @@ export default function RegisterPage() {
       await api.auth.sendOtp(cleanEmail);
       setOtp(['', '', '', '', '', '']);
     } catch (err: any) {
+      let msg = "Failed to resend OTP";
+      try {
+        const parsed = JSON.parse(err.message);
+        msg = parsed?.error?.message || msg;
+      } catch {
+        msg = err.message || msg;
+      }
       setErrors({
-        general: err.message || "Failed to resend OTP",
+        general: msg,
       });
     } finally {
       setLoading(false);
@@ -97,8 +135,15 @@ export default function RegisterPage() {
         });
       }
     } catch (err: any) {
+      let msg = "Invalid OTP";
+      try {
+        const parsed = JSON.parse(err.message);
+        msg = parsed?.error?.message || msg;
+      } catch {
+        msg = err.message || msg;
+      }
       setErrors({
-        general: err.message || "Invalid OTP",
+        general: msg,
       });
     } finally {
       setLoading(false);
@@ -214,7 +259,7 @@ export default function RegisterPage() {
         </label>
         {errors.terms && <p style={{ color: '#EF4444', fontSize: '0.75rem', margin: '0.25rem 0 0' }}>{errors.terms}</p>}
         <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.875rem', marginTop: '1.5rem' }} onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Creating Account...' : 'Create Account'}
+          {loading ? loadingText : 'Create Account'}
         </button>
         <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.875rem', color: '#64748B' }}>
           Already have an account?{' '}
